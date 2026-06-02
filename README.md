@@ -92,6 +92,31 @@ The CLI auto-selects the first GPU device the ggml registry reports, so no runti
 
 ---
 
+## Docker
+
+Prebuilt images are published to GitHub Container Registry on every push to `master`. They contain just the `parakeet-cli` binary, so mount a converted `.gguf` model and your audio at runtime. Both the CPU and CUDA images are multi-arch (`linux/amd64` and `linux/arm64`), so the right one is pulled for your host automatically:
+
+```sh
+# CPU
+docker run --rm \
+  -v "$PWD/models:/models:ro" \
+  -v "$PWD/audio:/audio:ro" \
+  ghcr.io/mudler/parakeet.cpp-cli:latest \
+  transcribe --model /models/parakeet-tdt_ctc-110m-q5_k.gguf --input /audio/speech.wav --decoder tdt
+
+# CUDA (needs the nvidia container toolkit on the host)
+docker run --rm --gpus all \
+  -v "$PWD/models:/models:ro" -v "$PWD/audio:/audio:ro" \
+  ghcr.io/mudler/parakeet.cpp-cli:latest-cuda \
+  transcribe --model /models/parakeet-tdt_ctc-110m-q5_k.gguf --input /audio/speech.wav --decoder tdt
+```
+
+The CUDA image is built on CUDA 13, so it covers everything from Turing up through Blackwell, including GB10 / Grace-Blackwell (DGX Spark) on arm64.
+
+To build the image yourself, see the build args at the top of the [`Dockerfile`](Dockerfile). The CPU image is the portable `GGML_NATIVE=OFF` build, so it runs on any amd64 or arm64 host.
+
+---
+
 ## Python environment setup
 
 You need this once, for model conversion and validation. It's not needed for inference:
