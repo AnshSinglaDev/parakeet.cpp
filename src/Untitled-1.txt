@@ -1,0 +1,334 @@
+[Hugging Face](https://huggingface.co/)
+- [Models](https://huggingface.co/models)
+- [Datasets](https://huggingface.co/datasets)
+- [Spaces](https://huggingface.co/spaces)
+- [Buckets new](https://huggingface.co/storage)
+- [Docs](https://huggingface.co/docs)
+- [Enterprise](https://huggingface.co/enterprise)
+- [Pricing](https://huggingface.co/pricing)
+-     Website [Tasks](https://huggingface.co/tasks) [HuggingChat](https://huggingface.co/chat) [Collections](https://huggingface.co/collections) [Languages](https://huggingface.co/languages) [Organizations](https://huggingface.co/organizations)  Community [Blog](https://huggingface.co/blog) [Posts](https://huggingface.co/posts) [Daily Papers](https://huggingface.co/papers) [Learn](https://huggingface.co/learn) [Discord](https://huggingface.co/join/discord) [Forum](https://discuss.huggingface.co/) [GitHub](https://github.com/huggingface)  Solutions [Team & Enterprise](https://huggingface.co/enterprise) [Hugging Face PRO](https://huggingface.co/pro) [Enterprise Support](https://huggingface.co/support) [Inference Providers](https://huggingface.co/inference/models) [Inference Endpoints](https://huggingface.co/inference-endpoints) [Storage Buckets](https://huggingface.co/storage)   
+- Website [Tasks](https://huggingface.co/tasks) [HuggingChat](https://huggingface.co/chat) [Collections](https://huggingface.co/collections) [Languages](https://huggingface.co/languages) [Organizations](https://huggingface.co/organizations) 
+- [Tasks](https://huggingface.co/tasks) 
+- [HuggingChat](https://huggingface.co/chat) 
+- [Collections](https://huggingface.co/collections) 
+- [Languages](https://huggingface.co/languages) 
+- [Organizations](https://huggingface.co/organizations) 
+- Community [Blog](https://huggingface.co/blog) [Posts](https://huggingface.co/posts) [Daily Papers](https://huggingface.co/papers) [Learn](https://huggingface.co/learn) [Discord](https://huggingface.co/join/discord) [Forum](https://discuss.huggingface.co/) [GitHub](https://github.com/huggingface) 
+- [Blog](https://huggingface.co/blog) 
+- [Posts](https://huggingface.co/posts) 
+- [Daily Papers](https://huggingface.co/papers) 
+- [Learn](https://huggingface.co/learn) 
+- [Discord](https://huggingface.co/join/discord) 
+- [Forum](https://discuss.huggingface.co/) 
+- [GitHub](https://github.com/huggingface) 
+- Solutions [Team & Enterprise](https://huggingface.co/enterprise) [Hugging Face PRO](https://huggingface.co/pro) [Enterprise Support](https://huggingface.co/support) [Inference Providers](https://huggingface.co/inference/models) [Inference Endpoints](https://huggingface.co/inference-endpoints) [Storage Buckets](https://huggingface.co/storage) 
+- [Team & Enterprise](https://huggingface.co/enterprise) 
+- [Hugging Face PRO](https://huggingface.co/pro) 
+- [Enterprise Support](https://huggingface.co/support) 
+- [Inference Providers](https://huggingface.co/inference/models) 
+- [Inference Endpoints](https://huggingface.co/inference-endpoints) 
+- [Storage Buckets](https://huggingface.co/storage) 
+- 
+- [Log In](https://huggingface.co/login)
+- [Sign Up](https://huggingface.co/join)
+[Models](https://huggingface.co/models)
+[Datasets](https://huggingface.co/datasets)
+[Spaces](https://huggingface.co/spaces)
+[Buckets new](https://huggingface.co/storage)
+[Docs](https://huggingface.co/docs)
+[Enterprise](https://huggingface.co/enterprise)
+[Pricing](https://huggingface.co/pricing)
+- Website [Tasks](https://huggingface.co/tasks) [HuggingChat](https://huggingface.co/chat) [Collections](https://huggingface.co/collections) [Languages](https://huggingface.co/languages) [Organizations](https://huggingface.co/organizations) 
+- [Tasks](https://huggingface.co/tasks) 
+- [HuggingChat](https://huggingface.co/chat) 
+- [Collections](https://huggingface.co/collections) 
+- [Languages](https://huggingface.co/languages) 
+- [Organizations](https://huggingface.co/organizations) 
+- Community [Blog](https://huggingface.co/blog) [Posts](https://huggingface.co/posts) [Daily Papers](https://huggingface.co/papers) [Learn](https://huggingface.co/learn) [Discord](https://huggingface.co/join/discord) [Forum](https://discuss.huggingface.co/) [GitHub](https://github.com/huggingface) 
+- [Blog](https://huggingface.co/blog) 
+- [Posts](https://huggingface.co/posts) 
+- [Daily Papers](https://huggingface.co/papers) 
+- [Learn](https://huggingface.co/learn) 
+- [Discord](https://huggingface.co/join/discord) 
+- [Forum](https://discuss.huggingface.co/)
+
+- [GitHub](https://github.com/huggingface) 
+- Solutions [Team & Enterprise](https://huggingface.co/enterprise) [Hugging Face PRO](https://huggingface.co/pro) [Enterprise Support](https://huggingface.co/support) [Inference Providers](https://huggingface.co/inference/models) [Inference Endpoints](https://huggingface.co/inference-endpoints) [Storage Buckets](https://huggingface.co/storage) 
+- [Team & Enterprise](https://huggingface.co/enterprise) 
+- [Hugging Face PRO](https://huggingface.co/pro) 
+- [Enterprise Support](https://huggingface.co/support) 
+- [Inference Providers](https://huggingface.co/inference/models) 
+- [Inference Endpoints](https://huggingface.co/inference-endpoints) 
+- [Storage Buckets](https://huggingface.co/storage) 
+- [Tasks](https://huggingface.co/tasks) 
+- [HuggingChat](https://huggingface.co/chat) 
+- [Collections](https://huggingface.co/collections) 
+- [Languages](https://huggingface.co/languages) 
+- [Organizations](https://huggingface.co/organizations) 
+[Tasks](https://huggingface.co/tasks)
+[HuggingChat](https://huggingface.co/chat)
+[Collections](https://huggingface.co/collections)
+[Languages](https://huggingface.co/languages)
+[Organizations](https://huggingface.co/organizations)
+- [Blog](https://huggingface.co/blog) 
+- [Posts](https://huggingface.co/posts) 
+- [Daily Papers](https://huggingface.co/papers) 
+- [Learn](https://huggingface.co/learn) 
+- [Discord](https://huggingface.co/join/discord) 
+- [Forum](https://discuss.huggingface.co/) 
+- [GitHub](https://github.com/huggingface) 
+[Blog](https://huggingface.co/blog)
+[Posts](https://huggingface.co/posts)
+[Daily Papers](https://huggingface.co/papers)
+[Learn](https://huggingface.co/learn)
+[Discord](https://huggingface.co/join/discord)
+[Forum](https://discuss.huggingface.co/)
+[GitHub](https://github.com/huggingface)
+- [Team & Enterprise](https://huggingface.co/enterprise) 
+- [Hugging Face PRO](https://huggingface.co/pro) 
+- [Enterprise Support](https://huggingface.co/support) 
+- [Inference Providers](https://huggingface.co/inference/models) 
+- [Inference Endpoints](https://huggingface.co/inference-endpoints) 
+- [Storage Buckets](https://huggingface.co/storage) 
+[Team & Enterprise](https://huggingface.co/enterprise)
+[Hugging Face PRO](https://huggingface.co/pro)
+[Enterprise Support](https://huggingface.co/support)
+[Inference Providers](https://huggingface.co/inference/models)
+[Inference Endpoints](https://huggingface.co/inference-endpoints)
+[Storage Buckets](https://huggingface.co/storage)
+[Log In](https://huggingface.co/login)
+[Sign Up](https://huggingface.co/join)
+
+# https://huggingface.co/[ai4bharat](https://huggingface.co/ai4bharat) ai4bharat / [IndicConformer](https://huggingface.co/ai4bharat/IndicConformer) like 5 Follow AI4Bharat 1.75k
+
+[ai4bharat](https://huggingface.co/ai4bharat)
+[IndicConformer](https://huggingface.co/ai4bharat/IndicConformer)
+[NeMo](https://huggingface.co/models?library=nemo)
+[PyTorch](https://huggingface.co/models?library=pytorch)
+[NeMo](https://huggingface.co/models?other=NeMo)
+[Model card](https://huggingface.co/ai4bharat/IndicConformer)
+[Files Files and versions   xet](https://huggingface.co/ai4bharat/IndicConformer/tree/main)
+[Community 3](https://huggingface.co/ai4bharat/IndicConformer/discussions)
+
+### Instructions to use ai4bharat/IndicConformer with libraries, inference providers, notebooks, and local apps. Follow these links to get started.
+
+- Libraries
+- [NeMo](https://huggingface.co/ai4bharat/IndicConformer?library=nemo) How to use ai4bharat/IndicConformer with NeMo:  # tag did not correspond to a valid NeMo domain.
+- Notebooks
+- [Google Colab](https://huggingface.co/ai4bharat/IndicConformer/colab) 
+- [Kaggle](https://huggingface.co/ai4bharat/IndicConformer/kaggle) 
+[NeMo](https://huggingface.co/ai4bharat/IndicConformer?library=nemo)
+How to use ai4bharat/IndicConformer with NeMo:
+
+```
+# tag did not correspond to a valid NeMo domain.
+```
+
+[Google Colab](https://huggingface.co/ai4bharat/IndicConformer/colab)
+[Kaggle](https://huggingface.co/ai4bharat/IndicConformer/kaggle)
+
+## You need to agree to share your contact information to access this model
+
+This repository is publicly accessible, but you have to accept the conditions to access its files and content.
+[Log in](https://huggingface.co/login?next=/ai4bharat/IndicConformer) or [Sign Up](https://huggingface.co/join?next=/ai4bharat/IndicConformer) to review the conditions and access this model content.
+- [Indicconformer](https://huggingface.co/ai4bharat/IndicConformer#indicconformer) [NVIDIA NeMo: [Training](https://huggingface.co/ai4bharat/IndicConformer#training)](https://huggingface.co/ai4bharat/IndicConformer#nvidia-nemo-training) [How to Use this Model](https://huggingface.co/ai4bharat/IndicConformer#how-to-use-this-model) [Automatically instantiate the model](https://huggingface.co/ai4bharat/IndicConformer#automatically-instantiate-the-model)[[[[NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-3)](https://huggingface.co/ai4bharat/IndicConformer#note-2)](https://huggingface.co/ai4bharat/IndicConformer#note-1)](https://huggingface.co/ai4bharat/IndicConformer#note)[Input](https://huggingface.co/ai4bharat/IndicConformer#input)[Output](https://huggingface.co/ai4bharat/IndicConformer#output)[Model Architecture](https://huggingface.co/ai4bharat/IndicConformer#model-architecture) Training NOTE[Datasets](https://huggingface.co/ai4bharat/IndicConformer#datasets)NOTE[Performance](https://huggingface.co/ai4bharat/IndicConformer#performance) NOTE[Limitations](https://huggingface.co/ai4bharat/IndicConformer#limitations) [Note](https://huggingface.co/ai4bharat/IndicConformer#note-4)[License](https://huggingface.co/ai4bharat/IndicConformer#license) [References](https://huggingface.co/ai4bharat/IndicConformer#references) 
+- [NVIDIA NeMo: Training](https://huggingface.co/ai4bharat/IndicConformer#nvidia-nemo-training) 
+- [How to Use this Model](https://huggingface.co/ai4bharat/IndicConformer#how-to-use-this-model) [Automatically instantiate the model](https://huggingface.co/ai4bharat/IndicConformer#automatically-instantiate-the-model)[NOTE](https://huggingface.co/ai4bharat/IndicConformer#note)[Input](https://huggingface.co/ai4bharat/IndicConformer#input)[Output](https://huggingface.co/ai4bharat/IndicConformer#output)
+- [Automatically instantiate the model](https://huggingface.co/ai4bharat/IndicConformer#automatically-instantiate-the-model)
+- [NOTE](https://huggingface.co/ai4bharat/IndicConformer#note)
+- [Input](https://huggingface.co/ai4bharat/IndicConformer#input)
+- [Output](https://huggingface.co/ai4bharat/IndicConformer#output)
+- [Model Architecture](https://huggingface.co/ai4bharat/IndicConformer#model-architecture) 
+- [Training](https://huggingface.co/ai4bharat/IndicConformer#training) [[NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-2)](https://huggingface.co/ai4bharat/IndicConformer#note-1)[Datasets](https://huggingface.co/ai4bharat/IndicConformer#datasets)NOTE
+- [NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-1)
+- [Datasets](https://huggingface.co/ai4bharat/IndicConformer#datasets)
+- [NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-2)
+- [Performance](https://huggingface.co/ai4bharat/IndicConformer#performance) [NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-3)
+- [NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-3)
+- [Limitations](https://huggingface.co/ai4bharat/IndicConformer#limitations) [Note](https://huggingface.co/ai4bharat/IndicConformer#note-4)
+- [Note](https://huggingface.co/ai4bharat/IndicConformer#note-4)
+- [License](https://huggingface.co/ai4bharat/IndicConformer#license) 
+- [References](https://huggingface.co/ai4bharat/IndicConformer#references) 
+[Indicconformer](https://huggingface.co/ai4bharat/IndicConformer#indicconformer)
+- [NVIDIA NeMo: Training](https://huggingface.co/ai4bharat/IndicConformer#nvidia-nemo-training) 
+- [How to Use this Model](https://huggingface.co/ai4bharat/IndicConformer#how-to-use-this-model) [Automatically instantiate the model](https://huggingface.co/ai4bharat/IndicConformer#automatically-instantiate-the-model)[NOTE](https://huggingface.co/ai4bharat/IndicConformer#note)[Input](https://huggingface.co/ai4bharat/IndicConformer#input)[Output](https://huggingface.co/ai4bharat/IndicConformer#output)
+- [Automatically instantiate the model](https://huggingface.co/ai4bharat/IndicConformer#automatically-instantiate-the-model)
+- [NOTE](https://huggingface.co/ai4bharat/IndicConformer#note)
+- [Input](https://huggingface.co/ai4bharat/IndicConformer#input)
+- [Output](https://huggingface.co/ai4bharat/IndicConformer#output)
+
+## You need to agree to share your contact information to access this model
+
+- [Model Architecture](https://huggingface.co/ai4bharat/IndicConformer#model-architecture) 
+- [Training](https://huggingface.co/ai4bharat/IndicConformer#training) [[NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-2)](https://huggingface.co/ai4bharat/IndicConformer#note-1)[Datasets](https://huggingface.co/ai4bharat/IndicConformer#datasets)NOTE
+- [NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-1)
+- [Datasets](https://huggingface.co/ai4bharat/IndicConformer#datasets)
+- [NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-2)
+- [Performance](https://huggingface.co/ai4bharat/IndicConformer#performance) [NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-3)
+- [NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-3)
+- [Limitations](https://huggingface.co/ai4bharat/IndicConformer#limitations) [Note](https://huggingface.co/ai4bharat/IndicConformer#note-4)
+- [Note](https://huggingface.co/ai4bharat/IndicConformer#note-4)
+- [License](https://huggingface.co/ai4bharat/IndicConformer#license) 
+- [References](https://huggingface.co/ai4bharat/IndicConformer#references) 
+[NVIDIA NeMo: Training](https://huggingface.co/ai4bharat/IndicConformer#nvidia-nemo-training)
+[How to Use this Model](https://huggingface.co/ai4bharat/IndicConformer#how-to-use-this-model)
+- [Automatically instantiate the model](https://huggingface.co/ai4bharat/IndicConformer#automatically-instantiate-the-model)
+- [NOTE](https://huggingface.co/ai4bharat/IndicConformer#note)
+- [Input](https://huggingface.co/ai4bharat/IndicConformer#input)
+- [Output](https://huggingface.co/ai4bharat/IndicConformer#output)
+[Automatically instantiate the model](https://huggingface.co/ai4bharat/IndicConformer#automatically-instantiate-the-model)
+[NOTE](https://huggingface.co/ai4bharat/IndicConformer#note)
+[Input](https://huggingface.co/ai4bharat/IndicConformer#input)
+[Output](https://huggingface.co/ai4bharat/IndicConformer#output)
+[Model Architecture](https://huggingface.co/ai4bharat/IndicConformer#model-architecture)
+[Training](https://huggingface.co/ai4bharat/IndicConformer#training)
+- [NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-1)
+- [Datasets](https://huggingface.co/ai4bharat/IndicConformer#datasets)
+- [NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-2)
+[NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-1)
+[Datasets](https://huggingface.co/ai4bharat/IndicConformer#datasets)
+[NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-2)
+[Performance](https://huggingface.co/ai4bharat/IndicConformer#performance)
+- [NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-3)
+[NOTE](https://huggingface.co/ai4bharat/IndicConformer#note-3)
+[Limitations](https://huggingface.co/ai4bharat/IndicConformer#limitations)
+- [Note](https://huggingface.co/ai4bharat/IndicConformer#note-4)
+[Note](https://huggingface.co/ai4bharat/IndicConformer#note-4)
+[License](https://huggingface.co/ai4bharat/IndicConformer#license)
+[References](https://huggingface.co/ai4bharat/IndicConformer#references)
+
+# https://huggingface.co/ai4bharat/IndicConformer#indicconformer Indicconformer
+
+https://huggingface.co/ai4bharat/IndicConformer#datasetshttps://huggingface.co/ai4bharat/IndicConformer#model-architecturehttps://huggingface.co/ai4bharat/IndicConformer#model-architecture | |
+Put a short model description here.
+See the [model architecture](https://huggingface.co/ai4bharat/IndicConformer#model-architecture) section and [NeMo documentation](https://docs.nvidia.com/deeplearning/nemo/user-guide/docs/en/stable/index.html) for complete architecture details.
+
+## https://huggingface.co/ai4bharat/IndicConformer#nvidia-nemo-training NVIDIA NeMo: Training
+To train, fine-tune or play with the model you will need to install [NVIDIA NeMo](https://github.com/NVIDIA/NeMo). We recommend you install it after you've installed latest Pytorch version.
+
+```
+pip install nemo_toolkit['all']
+```
+
+
+```
+pip install nemo_toolkit['all']
+```
+
+## https://huggingface.co/ai4bharat/IndicConformer#how-to-use-this-model How to Use this Model
+The model is available for use in the NeMo toolkit [3], and can be used as a pre-trained checkpoint for inference or for fine-tuning on another dataset.
+
+### https://huggingface.co/ai4bharat/IndicConformer#automatically-instantiate-the-model Automatically instantiate the model
+NOTE: Please update the model class below to match the class of the model being uploaded.
+
+```
+from nemo.core import ModelPT model = ModelPT.from_pretrained("ai4bharat/IndicConformer")
+```
+
+
+```
+from nemo.core import ModelPT model = ModelPT.from_pretrained("ai4bharat/IndicConformer")
+```
+
+### https://huggingface.co/ai4bharat/IndicConformer#note NOTE
+```
+Add some information about how to use the model here. An example is provided for ASR inference below. ### Transcribing using Python First, let's get a sample ``` wget https://dldata-public.s3.us-east-2.amazonaws.com/2086-149220-0033.wav ``` Then simply do: ``` asr_model.transcribe(['2086-149220-0033.wav']) ``` ### Transcribing many audio files ```shell python [NEMO_GIT_FOLDER]/examples/asr/transcribe_speech.py pretrained_name="ai4bharat/IndicConformer" audio_dir="" ```
+```
+
+
+```
+Add some information about how to use the model here. An example is provided for ASR inference below. ### Transcribing using Python First, let's get a sample ``` wget https://dldata-public.s3.us-east-2.amazonaws.com/2086-149220-0033.wav ``` Then simply do: ``` asr_model.transcribe(['2086-149220-0033.wav']) ``` ### Transcribing many audio files ```shell python [NEMO_GIT_FOLDER]/examples/asr/transcribe_speech.py pretrained_name="ai4bharat/IndicConformer" audio_dir="" ```
+```
+
+### https://huggingface.co/ai4bharat/IndicConformer#input Input
+Add some information about what are the inputs to this model
+
+### https://huggingface.co/ai4bharat/IndicConformer#output Output
+Add some information about what are the outputs of this model
+
+## https://huggingface.co/ai4bharat/IndicConformer#model-architecture Model Architecture
+Add information here discussing architectural details of the model or any comments to users about the model.
+
+## https://huggingface.co/ai4bharat/IndicConformer#training Training
+Add information here about how the model was trained. It should be as detailed as possible, potentially including the the link to the script used to train as well as the base config used to train the model. If extraneous scripts are used to prepare the components of the model, please include them here.
+
+### https://huggingface.co/ai4bharat/IndicConformer#note-1 NOTE
+```
+An example is provided below for ASR The NeMo toolkit [3] was used for training the models for over several hundred epochs. These model are trained with this [example script](https://github.com/NVIDIA/NeMo/blob/main/examples/asr/asr_transducer/speech_to_text_rnnt_bpe.py) and this [base config](https://github.com/NVIDIA/NeMo/blob/main/examples/asr/conf/fastconformer/fast-conformer_transducer_bpe.yaml). The tokenizers for these models were built using the text transcripts of the train set with this [script](https://github.com/NVIDIA/NeMo/blob/main/scripts/tokenizers/process_asr_text_tokenizer.py).
+```
+
+
+```
+An example is provided below for ASR The NeMo toolkit [3] was used for training the models for over several hundred epochs. These model are trained with this [example script](https://github.com/NVIDIA/NeMo/blob/main/examples/asr/asr_transducer/speech_to_text_rnnt_bpe.py) and this [base config](https://github.com/NVIDIA/NeMo/blob/main/examples/asr/conf/fastconformer/fast-conformer_transducer_bpe.yaml). The tokenizers for these models were built using the text transcripts of the train set with this [script](https://github.com/NVIDIA/NeMo/blob/main/scripts/tokenizers/process_asr_text_tokenizer.py).
+```
+
+### https://huggingface.co/ai4bharat/IndicConformer#datasets Datasets
+Try to provide as detailed a list of datasets as possible. If possible, provide links to the datasets on HF by adding it to the manifest section at the top of the README (marked by ---).
+
+### https://huggingface.co/ai4bharat/IndicConformer#note-2 NOTE
+```
+An example for the manifest section is provided below for ASR datasets datasets: - librispeech_asr - fisher_corpus - Switchboard-1 - WSJ-0 - WSJ-1 - National-Singapore-Corpus-Part-1 - National-Singapore-Corpus-Part-6 - vctk - voxpopuli - europarl - multilingual_librispeech - mozilla-foundation/common_voice_8_0 - MLCommons/peoples_speech The corresponding text in this section for those datasets is stated below - The model was trained on 64K hours of English speech collected and prepared by NVIDIA NeMo and Suno teams. The training dataset consists of private subset with 40K hours of English speech plus 24K hours from the following public datasets: - Librispeech 960 hours of English speech - Fisher Corpus - Switchboard-1 Dataset - WSJ-0 and WSJ-1 - National Speech Corpus (Part 1, Part 6) - VCTK - VoxPopuli (EN) - Europarl-ASR (EN) - Multilingual Librispeech (MLS EN) - 2,000 hour subset - Mozilla Common Voice (v7.0) - People's Speech - 12,000 hour subset
+```
+
+
+```
+An example for the manifest section is provided below for ASR datasets datasets: - librispeech_asr - fisher_corpus - Switchboard-1 - WSJ-0 - WSJ-1 - National-Singapore-Corpus-Part-1 - National-Singapore-Corpus-Part-6 - vctk - voxpopuli - europarl - multilingual_librispeech - mozilla-foundation/common_voice_8_0 - MLCommons/peoples_speech The corresponding text in this section for those datasets is stated below - The model was trained on 64K hours of English speech collected and prepared by NVIDIA NeMo and Suno teams. The training dataset consists of private subset with 40K hours of English speech plus 24K hours from the following public datasets: - Librispeech 960 hours of English speech - Fisher Corpus - Switchboard-1 Dataset - WSJ-0 and WSJ-1 - National Speech Corpus (Part 1, Part 6) - VCTK - VoxPopuli (EN) - Europarl-ASR (EN) - Multilingual Librispeech (MLS EN) - 2,000 hour subset - Mozilla Common Voice (v7.0) - People's Speech - 12,000 hour subset
+```
+
+## https://huggingface.co/ai4bharat/IndicConformer#performance Performance
+
+**Add information here about the performance of the model. Discuss what is the metric that is being used to evaluate the model and if there are external links explaning the custom metric, please link to it.
+
+### https://huggingface.co/ai4bharat/IndicConformer#note-3 NOTE
+
+```
+An example is provided below for ASR metrics list that can be added to the top of the README model-index: - name: PUT_MODEL_NAME results: - task: name: Automatic Speech Recognition type: automatic-speech-recognition dataset: name: AMI (Meetings test) type: edinburghcstr/ami config: ihm split: test args: language: en metrics: - name: Test WER type: wer value: 17.10 - task: name: Automatic Speech Recognition type: automatic-speech-recognition dataset: name: Earnings-22 type: revdotcom/earnings22 split: test args: language: en metrics: - name: Test WER type: wer value: 14.11
+```
+
+
+```
+An example is provided below for ASR metrics list that can be added to the top of the README model-index: - name: PUT_MODEL_NAME results: - task: name: Automatic Speech Recognition type: automatic-speech-recognition dataset: name: AMI (Meetings test) type: edinburghcstr/ami config: ihm split: test args: language: en metrics: - name: Test WER type: wer value: 17.10 - task: name: Automatic Speech Recognition type: automatic-speech-recognition dataset: name: Earnings-22 type: revdotcom/earnings22 split: test args: language: en metrics: - name: Test WER type: wer value: 14.11
+```
+
+Provide any caveats about the results presented in the top of the discussion so that nuance is not lost.
+It should ideally be in a tabular format (you can use the following website to make your tables in markdown format - [https://www.tablesgenerator.com/markdown_tables](https://www.tablesgenerator.com/markdown_tables))**
+
+## https://huggingface.co/ai4bharat/IndicConformer#limitations Limitations
+
+Discuss any practical limitations to the model when being used in real world cases. They can also be legal disclaimers, or discussion regarding the safety of the model (particularly in the case of LLMs).
+
+### https://huggingface.co/ai4bharat/IndicConformer#note-4 Note
+
+```
+An example is provided below Since this model was trained on publicly available speech datasets, the performance of this model might degrade for speech which includes technical terms, or vernacular that the model has not been trained on. The model might also perform worse for accented speech.
+```
+
+
+```
+An example is provided below Since this model was trained on publicly available speech datasets, the performance of this model might degrade for speech which includes technical terms, or vernacular that the model has not been trained on. The model might also perform worse for accented speech.
+```
+
+## https://huggingface.co/ai4bharat/IndicConformer#license License
+License to use this model is covered by the [[CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)](https://creativecommons.org/licenses/by/4.0/). By downloading the public and release version of the model, you accept the terms and conditions of the CC-BY-4.0 license.
+
+## https://huggingface.co/ai4bharat/IndicConformer#references References
+Provide appropriate references in the markdown link format below. Please order them numerically.
+[1] [NVIDIA NeMo Toolkit](https://github.com/NVIDIA/NeMo)
+[NEW](https://huggingface.co/docs/inference-providers)
+[🙋  Ask for provider support](https://huggingface.co/spaces/huggingface/InferenceSupport/discussions/new?title=ai4bharat/IndicConformer&description=React%20to%20this%20comment%20with%20an%20emoji%20to%20vote%20for%20%5Bai4bharat%2FIndicConformer%5D(%2Fai4bharat%2FIndicConformer)%20to%20be%20supported%20by%20Inference%20Providers.%0A%0A(optional)%20Which%20providers%20are%20you%20interested%20in%3F%20(Novita%2C%20Hyperbolic%2C%20Together%E2%80%A6)%0A)
+
+## Spaces using ai4bharat/IndicConformer 5
+[ai4bharat/indic-conformer](https://huggingface.co/spaces/ai4bharat/indic-conformer)
+[📈 navyaparesh/Modeltest](https://huggingface.co/spaces/navyaparesh/Modeltest)
+[🏆 Srish117/indic-conformer](https://huggingface.co/spaces/Srish117/indic-conformer)
+[🏆 trysem/indic-conformerPi](https://huggingface.co/spaces/trysem/indic-conformerPi)
+[🏆 munzurul/indic-conformer](https://huggingface.co/spaces/munzurul/indic-conformer)
+[TOS](https://huggingface.co/terms-of-service)
+[Privacy](https://huggingface.co/privacy)
+[About](https://huggingface.co/huggingface)
+[Careers](https://apply.workable.com/huggingface/)
+[Models](https://huggingface.co/models)
+[Datasets](https://huggingface.co/datasets)
+[Spaces](https://huggingface.co/spaces)
+[Pricing](https://huggingface.co/pricing)
+[Docs](https://huggingface.co/docs)

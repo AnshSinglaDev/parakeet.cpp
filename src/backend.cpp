@@ -74,12 +74,26 @@ Backend::Backend(int n_threads) : impl_(new Impl()) {
     const bool force_cpu = force && std::string(force) == "cpu";
 
     if (!force_cpu) {
-        // Pick the first GPU device the registry reports. Whatever backend was
-        // compiled in (CUDA/Metal/Vulkan/HIP/SYCL) registers itself here, so this
-        // single path covers them all with no backend-specific includes.
+        ggml_backend_load_all();
         for (size_t i = 0; i < ggml_backend_dev_count(); ++i) {
             ggml_backend_dev_t dev = ggml_backend_dev_get(i);
-            if (ggml_backend_dev_type(dev) == GGML_BACKEND_DEVICE_TYPE_GPU) {
+            std::string dev_name = ggml_backend_dev_name(dev);
+            std::string dev_desc = ggml_backend_dev_description(dev);
+            PK_LOG("Found device %zu: name='%s' desc='%s'", i, dev_name.c_str(), dev_desc.c_str());
+            
+            if (force) {
+                std::string force_str = std::string(force);
+                // Convert both to lower for case-insensitive match (basic)
+                for (auto & c: dev_name) c = tolower(c);
+                for (auto & c: dev_desc) c = tolower(c);
+                for (auto & c: force_str) c = tolower(c);
+                if (dev_name.find(force_str) == std::string::npos && dev_desc.find(force_str) == std::string::npos) {
+                    continue;
+                }
+            }
+
+            auto type = ggml_backend_dev_type(dev);
+            if (type == GGML_BACKEND_DEVICE_TYPE_GPU || type == GGML_BACKEND_DEVICE_TYPE_IGPU) {
                 impl_->backend = ggml_backend_dev_init(dev, nullptr);
                 if (impl_->backend) {
                     device_name_ = ggml_backend_dev_name(dev);

@@ -160,9 +160,226 @@ def main():
     args = ap.parse_args()
 
     is_local = pathlib.Path(args.model).exists()
+    use_patches = "indic" in args.model.lower() or pathlib.Path("model_config.yaml").exists()
+
+    # Monkey-patch _setup_tokenizer to build AggregateBPE manually
+    if use_patches:
+        try:
+            from omegaconf import open_dict
+            import nemo.collections.asr.parts.mixins.mixins as mixins
+            class DummyTokenizer:
+                def __init__(self, vocab):
+                    self.vocab = vocab
+                    self.tokenizer = self
+                    self.vocab_size = len(vocab)
+                    self.token_id_offset = 0
+                    self.offset_token_ids_by_token_id = {}
+                    self.tokenizers_dict = {'dummy': self}
+                    self.langs_by_token_id = {i: "dummy" for i in range(len(vocab))}
+                    self.pad_id = 0
+                    self.bos_id = 1
+                    self.eos_id = 2
+                    self.blank_id = len(vocab)
+                def get_vocab(self):
+                    return self.vocab
+                def ids_to_tokens(self, ids):
+                    return [self.vocab[i] for i in ids]
+                    
+            def patched_setup_tokenizer(self, tokenizer_cfg):
+                import os
+                import yaml
+                import tarfile
+                
+                cfg = None
+                if tarfile.is_tarfile(args.model):
+                    with tarfile.open(args.model, 'r') as tar:
+                        for member in tar.getmembers():
+                            if member.name.endswith('model_config.yaml'):
+                                f = tar.extractfile(member)
+                                if f:
+                                    cfg = yaml.safe_load(f)
+                                break
+                
+                if cfg is None:
+                    config_path = 'model_config.yaml'
+                    if os.path.isdir(args.model):
+                        config_path = os.path.join(args.model, 'model_config.yaml')
+                    with open(config_path, 'r', encoding='utf-8') as f:
+                        cfg = yaml.safe_load(f)
+                
+                vocabulary = cfg.get('joint', {}).get('vocabulary', None)
+                if vocabulary is None:
+                    vocabulary = cfg.get('decoder', {}).get('vocabulary', None)
+                    
+                if vocabulary is None:
+                    langs_cfg = cfg['tokenizer']['langs']
+                    vocabulary = []
+                    for lang, lang_cfg in langs_cfg.items():
+                        vocab_path = lang_cfg['vocab_path']
+                        if vocab_path.startswith('nemo:'):
+                            vocab_path = vocab_path[5:]
+                        with open(vocab_path, 'r', encoding='utf-8') as f:
+                            lines = f.read().splitlines()
+                            vocabulary.extend(lines)
+                
+                self.tokenizer = DummyTokenizer(vocabulary)
+                self.tokenizer_cfg = tokenizer_cfg
+                self.tokenizer_type = "agg"
+                
+            mixins.ASRModuleMixin._setup_tokenizer = patched_setup_tokenizer
+        except Exception as e:
+            print(f"Failed to monkey-patch setup_tokenizer: {e}", file=sys.stderr)
+
+        # Monkey-patch RNNTDecoder to ignore multisoftmax
+        try:
+            import nemo.collections.asr.modules.rnnt as rnnt
+            original_decoder_init = rnnt.RNNTDecoder.__init__
+            def patched_decoder_init(self, *args, **kwargs):
+                if 'multisoftmax' in kwargs:
+                    del kwargs['multisoftmax']
+                original_decoder_init(self, *args, **kwargs)
+            rnnt.RNNTDecoder.__init__ = patched_decoder_init
+        except Exception as e:
+            pass
+
+        # Monkey-patch ConvASRDecoder
+        try:
+            import nemo.collections.asr.modules.conv_asr as conv_asr
+            original_conv_decoder_init = conv_asr.ConvASRDecoder.__init__
+            def patched_conv_decoder_init(self, *args, **kwargs):
+                if 'multisoftmax' in kwargs:
+                    del kwargs['multisoftmax']
+                if 'language_keys' in kwargs:
+                    del kwargs['language_keys']
+                original_conv_decoder_init(self, *args, **kwargs)
+            conv_asr.ConvASRDecoder.__init__ = patched_conv_decoder_init
+        except Exception as e:
+            pass
+
+        # Monkey-patch ConformerEncoder
+        try:
+            import nemo.collections.asr.modules.conformer_encoder as conformer_encoder
+            original_conformer_init = conformer_encoder.ConformerEncoder.__init__
+            def patched_conformer_init(self, *args, **kwargs):
+                if 'use_bias' in kwargs:
+                    del kwargs['use_bias']
+                original_conformer_init(self, *args, **kwargs)
+            conformer_encoder.ConformerEncoder.__init__ = patched_conformer_init
+        except Exception as e:
+            pass
+
+        # Monkey-patch RNNTJoint for multilingual models
+        try:
+            import nemo.collections.asr.modules.rnnt as rnnt
+            original_joint_init = rnnt.RNNTJoint.__init__
+            def patched_joint_init(self, *args, **kwargs):
+                if 'multilingual' in kwargs:
+                    del kwargs['multilingual']
+                if 'language_keys' in kwargs:
+                    del kwargs['language_keys']
+                original_joint_init(self, *args, **kwargs)
+            rnnt.RNNTJoint.__init__ = patched_joint_init
+            
+            import torch
+            def patched_joint_net_modules(self, num_classes, pred_n_hidden, enc_n_hidden, joint_n_hidden, activation, dropout):
+                pred = torch.nn.Linear(pred_n_hidden, joint_n_hidden)
+                enc = torch.nn.Linear(enc_n_hidden, joint_n_hidden)
+                if activation == 'relu':
+                    act = torch.nn.ReLU(inplace=True)
+                elif activation == 'sigmoid':
+                    act = torch.nn.Sigmoid()
+                elif activation == 'tanh':
+                    act = torch.nn.Tanh()
+                else:
+                    act = torch.nn.ReLU(inplace=True)
+                languages = ['as', 'bn', 'brx', 'doi', 'kok', 'gu', 'hi', 'kn', 'ks', 'mai', 'ml', 'mr', 'mni', 'ne', 'or', 'pa', 'sa', 'sat', 'sd', 'ta', 'te', 'ur']
+                multilingual_linear = torch.nn.ModuleDict({
+                    lang: torch.nn.Linear(joint_n_hidden, 257) for lang in languages
+                })
+                layers = [act] + ([torch.nn.Dropout(p=dropout)] if dropout else []) + [multilingual_linear]
+                return pred, enc, torch.nn.Sequential(*layers)
+            rnnt.RNNTJoint._joint_net_modules = patched_joint_net_modules
+        except Exception as e:
+            print(f"Failed to monkey-patch RNNTJoint: {e}", file=sys.stderr)
+
     try:
         if is_local:
-            m = ASRModel.restore_from(args.model, map_location="cpu")
+            import tarfile
+            import tempfile
+            import torch
+            from omegaconf import OmegaConf
+            import os
+
+            class DummyModel:
+                def __init__(self, nemo_path):
+                    self.tmpdir = tempfile.mkdtemp()
+                    with tarfile.open(nemo_path, "r") as tar:
+                        tar.extractall(self.tmpdir)
+                    
+                    config_path = None
+                    for root, dirs, files in os.walk(self.tmpdir):
+                        if 'model_config.yaml' in files:
+                            config_path = os.path.join(root, 'model_config.yaml')
+                            break
+                    self.cfg = OmegaConf.load(config_path)
+
+                    weights_path = None
+                    for root, dirs, files in os.walk(self.tmpdir):
+                        if 'model_weights.ckpt' in files:
+                            weights_path = os.path.join(root, 'model_weights.ckpt')
+                            break
+                        elif 'model.safetensors' in files:
+                            weights_path = os.path.join(root, 'model.safetensors')
+                            break
+                    
+                    if weights_path.endswith('.safetensors'):
+                        from safetensors.torch import load_file
+                        self._state_dict = load_file(weights_path)
+                    else:
+                        self._state_dict = torch.load(weights_path, map_location='cpu')
+                
+                def state_dict(self):
+                    return self._state_dict
+                
+                def eval(self):
+                    pass
+                
+                @property
+                def preprocessor(self):
+                    cfg = self.cfg.preprocessor
+                    hop_len = int(cfg.window_stride * cfg.sample_rate)
+                    class Featurizer:
+                        def __init__(self):
+                            self.n_fft = cfg.n_fft
+                            self.n_mels = cfg.features
+                            self.nfilt = cfg.features
+                            self.hop_length = hop_len
+                            self.win_length = int(cfg.window_size * cfg.sample_rate)
+                    class Preprocessor:
+                        def __init__(self):
+                            self.featurizer = Featurizer()
+                    return Preprocessor()
+                
+                @property
+                def tokenizer(self):
+                    vocab = []
+                    if hasattr(self.cfg, 'joint') and hasattr(self.cfg.joint, 'vocabulary'):
+                        vocab = list(self.cfg.joint.vocabulary)
+                    elif hasattr(self.cfg, 'decoder') and hasattr(self.cfg.decoder, 'vocabulary'):
+                        vocab = list(self.cfg.decoder.vocabulary)
+                    else:
+                        vocab = ["dummy"] * 8192
+                    
+                    class Tokenizer:
+                        def __init__(self):
+                            self.vocab_size = len(vocab)
+                        def get_vocab(self):
+                            return vocab
+                        def ids_to_tokens(self, ids):
+                            return [vocab[i] for i in ids]
+                    return Tokenizer()
+
+            m = DummyModel(args.model)
         else:
             m = ASRModel.from_pretrained(args.model, map_location="cpu")
     except Exception as e:  # pragma: no cover - network/cache guard
@@ -191,8 +408,10 @@ def main():
                  str(_get(enc, "conv_norm_type", "batch_norm")))
     w.add_uint32("parakeet.encoder.subsampling_factor",
                  int(_get(enc, "subsampling_factor")))
-    w.add_uint32("parakeet.encoder.subsampling_conv_channels",
-                 int(_get(enc, "subsampling_conv_channels")))
+    sub_ch = int(_get(enc, "subsampling_conv_channels"))
+    if sub_ch == -1:
+        sub_ch = int(_get(enc, "d_model"))
+    w.add_uint32("parakeet.encoder.subsampling_conv_channels", sub_ch)
     w.add_bool("parakeet.encoder.xscaling", bool(_get(enc, "xscaling", True)))
     w.add_uint32("parakeet.encoder.pos_emb_max_len",
                  int(_get(enc, "pos_emb_max_len", 5000)))
@@ -330,6 +549,35 @@ def main():
     # --dtype (ggml dequantizes them on the fly inside ggml_mul_mat); everything
     # else stays f32. Include featurizer buffers explicitly.
     sd = m.state_dict()
+    
+    # Reconstruct the joint.joint_net.2.weight and joint.joint_net.2.bias from the multilingual weights
+    languages = ['as', 'bn', 'brx', 'doi', 'kok', 'gu', 'hi', 'kn', 'ks', 'mai', 'ml', 'mr', 'mni', 'ne', 'or', 'pa', 'sa', 'sat', 'sd', 'ta', 'te', 'ur']
+    detected_lang = None
+    for lang in languages:
+        if f"joint.joint_net.2.{lang}.weight" in sd:
+            detected_lang = lang
+            break
+            
+    if detected_lang is not None:
+        import torch
+        joint_weight = torch.zeros(5633, 640)
+        joint_bias = torch.zeros(5633)
+        
+        lang_weight = sd[f"joint.joint_net.2.{detected_lang}.weight"] # shape [257, 640]
+        lang_bias = sd[f"joint.joint_net.2.{detected_lang}.bias"] # shape [257]
+        
+        lang_idx = languages.index(detected_lang)
+        offset = lang_idx * 256
+        
+        joint_weight[offset:offset + 256, :] = lang_weight[0:256, :]
+        joint_weight[5632, :] = lang_weight[256, :]
+        
+        joint_bias[offset:offset + 256] = lang_bias[0:256]
+        joint_bias[5632] = lang_bias[256]
+        
+        sd["joint.joint_net.2.weight"] = joint_weight
+        sd["joint.joint_net.2.bias"] = joint_bias
+
     written = 0
     quantized = 0
     keep_buffers = {"preprocessor.featurizer.fb", "preprocessor.featurizer.window"}
@@ -338,6 +586,11 @@ def main():
             continue  # skip preprocessor internals except fb/window
         if not hasattr(t, "detach"):
             continue
+            
+        # Skip language-specific joint weights (the standard joint.joint_net.2.weight/bias were reconstructed beforehand)
+        if name.startswith("joint.joint_net.2.") and name not in ("joint.joint_net.2.weight", "joint.joint_net.2.bias"):
+            continue
+            
         arr = t.detach().cpu().float().numpy()
         if arr.ndim == 0:
             continue  # skip scalar bookkeeping (e.g. num_batches_tracked)

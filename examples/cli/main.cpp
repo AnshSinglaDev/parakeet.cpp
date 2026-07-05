@@ -28,6 +28,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <iostream>
 
 static int cmd_info(const char* path) {
     pk::ModelLoader ml;
@@ -158,6 +159,7 @@ static int cmd_transcribe(int argc, char** argv) {
     bool stream = false;
     bool timestamps = false;
     bool json = false;
+    bool pipe = false;
     int threads = 0;  // 0 == unset -> use the persistent-backend default
     for (int i = 0; i < argc; ++i) {
         if (std::strcmp(argv[i], "--model") == 0 && i + 1 < argc) {
@@ -176,31 +178,20 @@ static int cmd_transcribe(int argc, char** argv) {
             threads = std::atoi(argv[++i]);
         } else if (std::strcmp(argv[i], "--json") == 0) {
             json = true;
+        } else if (std::strcmp(argv[i], "--pipe") == 0) {
+            pipe = true;
         }
     }
-    if (model.empty() || input.empty()) {
+    if (model.empty() || (input.empty() && !pipe)) {
         std::fprintf(stderr,
-            "usage: parakeet-cli transcribe --model <m.gguf> --input <wav> "
+            "usage: parakeet-cli transcribe --model <m.gguf> [--input <wav>] "
             "[--decoder ctc|tdt] [--lang <locale>] [--stream] [--timestamps] "
-            "[--threads N] [--json]\n");
+            "[--threads N] [--json] [--pipe]\n");
         return 2;
     }
     // Apply the thread override (offline + streaming graph compute). When unset
     // the persistent-backend default (kDefaultThreads) is used.
     if (threads > 0) pk::set_num_threads(threads);
-
-    if (stream) {
-        if (!decoder_str.empty()) {
-            std::fprintf(stderr,
-                "parakeet-cli: --stream is RNN-T only; --decoder is ignored\n");
-        }
-        if (json) {
-            std::fprintf(stderr,
-                "parakeet-cli: --json is not supported with --stream\n");
-            return 2;
-        }
-        return cmd_transcribe_stream(model, input, timestamps, lang);
-    }
 
     // Resolve the decoder selector.
     pk::Decoder dec = pk::Decoder::kDefault;
@@ -217,6 +208,48 @@ static int cmd_transcribe(int argc, char** argv) {
                          decoder_str.c_str());
             return 2;
         }
+    }
+
+    if (pipe) {
+        parakeet_ctx* ctx = parakeet_capi_load(model.c_str());
+        if (!ctx) {
+            std::fprintf(stderr, "parakeet-cli: failed to load model %s\n", model.c_str());
+            return 1;
+        }
+        std::printf("[SERVER_READY]\n");
+        std::fflush(stdout);
+
+        std::string line;
+        while (std::getline(std::cin, line)) {
+            if (line == "EXIT") {
+                break;
+            }
+            if (line.empty()) continue;
+            char* j = parakeet_capi_transcribe_path_json(ctx, line.c_str(), dec_int);
+            if (!j) {
+                std::printf("{\"error\":\"%s\"}\n", parakeet_capi_last_error(ctx));
+            } else {
+                std::printf("%s\n", j);
+                parakeet_capi_free_string(j);
+            }
+            std::printf("[END_TRANSCRIPTION]\n");
+            std::fflush(stdout);
+        }
+        parakeet_capi_free(ctx);
+        return 0;
+    }
+
+    if (stream) {
+        if (!decoder_str.empty()) {
+            std::fprintf(stderr,
+                "parakeet-cli: --stream is RNN-T only; --decoder is ignored\n");
+        }
+        if (json) {
+            std::fprintf(stderr,
+                "parakeet-cli: --json is not supported with --stream\n");
+            return 2;
+        }
+        return cmd_transcribe_stream(model, input, timestamps, lang);
     }
 
     // --json: emit the C-API JSON document (text + word/token timestamps + conf).

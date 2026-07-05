@@ -7,6 +7,10 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
+if(MSVC)
+  add_compile_definitions(_USE_MATH_DEFINES)
+endif()
+
 option(PARAKEET_BUILD_TESTS "Build ctest targets" OFF)
 option(PARAKEET_BUILD_CLI   "Build parakeet-cli" ON)
 option(PARAKEET_SHARED      "Build libparakeet as shared" OFF)
