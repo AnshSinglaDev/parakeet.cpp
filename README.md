@@ -1,383 +1,333 @@
-# parakeet.cpp
-
-**Brought to you by the [LocalAI](https://github.com/mudler/LocalAI) team**, the folks behind LocalAI, the open-source AI engine that runs any model (LLMs, vision, voice, image, video) on any hardware, no GPU required.
-
-[![Model on Hugging Face](https://huggingface.co/datasets/huggingface/badges/resolve/main/model-on-hf-md.svg)](https://huggingface.co/mudler/parakeet-cpp-gguf)
-[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![LocalAI](https://img.shields.io/badge/LocalAI-Run_Locally-orange)](https://github.com/mudler/LocalAI)
-
-parakeet.cpp is a C++17 inference port of NVIDIA's [NeMo](https://github.com/NVIDIA-NeMo/NeMo) Parakeet speech-recognition models, built on [ggml](https://github.com/ggml-org/ggml). It gives you fast, dependency-light automatic speech recognition on CPU (and on GPU through ggml's backends), with no Python runtime needed at inference time.
-
-It covers all the offline Parakeet families (CTC, RNNT, TDT, and hybrid TDT-CTC, in 0.6B/1.1B/110M sizes, English plus multilingual v3), each validated at WER 0 against NeMo on every published checkpoint. It also does **cache-aware streaming with end-of-utterance (EOU) detection** for `parakeet_realtime_eou_120m-v1`, where the streaming transcript matches NeMo's cache-aware streaming byte for byte. And it supports the **multilingual, prompt-conditioned streaming model** `nvidia/nemotron-3.5-asr-streaming-0.6b` (40+ locales): pass a target language with `--lang <locale>` (default `auto`) and both the offline and the cache-aware streaming transcripts match NeMo per language at WER 0. The full coverage matrix lives in `docs/parity.md`.
-
-It's faster than NeMo's PyTorch runtime on both CPU and GPU, with byte-identical transcripts. The full numbers, methodology, and all the plots are in [benchmarks/BENCHMARK.md](benchmarks/BENCHMARK.md).
-
 <p align="center">
-  <a href="benchmarks/BENCHMARK.md"><img src="benchmarks/plots/speedup.png" width="49%" alt="CPU speedup vs NeMo (RTFx ratio per dtype)"></a>
-  <a href="benchmarks/BENCHMARK.md"><img src="benchmarks/plots/gpu_speedup.png" width="49%" alt="GPU speedup vs NeMo on the NVIDIA GB10"></a>
+  <img src="https://img.shields.io/badge/🦜_parakeet.cpp-Indic_Edition-orange?style=for-the-badge" alt="parakeet.cpp Indic Edition"/>
 </p>
 
-It also runs circles around whisper.cpp on the same audio: the 110M Parakeet is faster than whisper base.en and far faster than large-v3-turbo, while the larger Parakeets match or beat whisper's accuracy (see [benchmarks/BENCHMARK.md](benchmarks/BENCHMARK.md)).
+<h1 align="center">parakeet.cpp — AI4Bharat Indic Edition</h1>
 
 <p align="center">
-  <a href="benchmarks/BENCHMARK.md"><img src="benchmarks/plots/vs_whisper.png" width="88%" alt="parakeet.cpp vs whisper.cpp RTFx on CPU and GPU"></a>
+  <b>A patched C++ inference engine for running AI4Bharat regional speech models locally — on CPU, CUDA, Metal, and Vulkan.</b>
+</p>
+
+<p align="center">
+  <a href="https://github.com/AnshSinglaDev/rendercaption"><img src="https://img.shields.io/badge/Desktop_App-RenderCaption-blue?style=flat-square&logo=github" alt="RenderCaption"/></a>
+  <a href="https://huggingface.co/Singla0009"><img src="https://img.shields.io/badge/🤗_Models-HuggingFace-yellow?style=flat-square" alt="HuggingFace Models"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT License"/></a>
+  <a href="https://github.com/mudler/parakeet.cpp"><img src="https://img.shields.io/badge/Upstream-mudler%2Fparakeet.cpp-lightgrey?style=flat-square" alt="Upstream"/></a>
 </p>
 
 ---
 
-## Supported models
+## ⚠️ Why This Repository Exists
 
-Every model below is validated at WER 0 against NeMo and published as GGUF (f16, q8_0, q6_k, q5_k, q4_k) in the single collection repo [mudler/parakeet-cpp-gguf](https://huggingface.co/mudler/parakeet-cpp-gguf). Convert any of them yourself with `scripts/convert_parakeet_to_gguf.py`. The per-model parity matrix is in [docs/parity.md](docs/parity.md).
+> **The official upstream [`mudler/parakeet.cpp`](https://github.com/mudler/parakeet.cpp) engine will crash with a fatal `GGML_ASSERT(a->ne[2] == 1)` error when you try to run AI4Bharat Indic models.**
 
-| Model | Type | Size | Notes | Source |
-| ----- | ---- | ---- | ----- | ------ |
-| [parakeet-tdt_ctc-110m](https://huggingface.co/nvidia/parakeet-tdt_ctc-110m) | hybrid TDT+CTC | 110M | English, the small anchor checkpoint | NVIDIA |
-| [parakeet-ctc-0.6b](https://huggingface.co/nvidia/parakeet-ctc-0.6b) | CTC | 0.6B | English | NVIDIA |
-| [parakeet-rnnt-0.6b](https://huggingface.co/nvidia/parakeet-rnnt-0.6b) | RNNT | 0.6B | English | NVIDIA |
-| [parakeet-tdt-0.6b-v2](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2) | TDT | 0.6B | English | NVIDIA |
-| [parakeet-tdt-0.6b-v3](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v3) | TDT | 0.6B | multilingual (25 European languages) | NVIDIA |
-| [parakeet-ctc-1.1b](https://huggingface.co/nvidia/parakeet-ctc-1.1b) | CTC | 1.1B | English | NVIDIA |
-| [parakeet-rnnt-1.1b](https://huggingface.co/nvidia/parakeet-rnnt-1.1b) | RNNT | 1.1B | English | NVIDIA |
-| [parakeet-tdt-1.1b](https://huggingface.co/nvidia/parakeet-tdt-1.1b) | TDT | 1.1B | English | NVIDIA |
-| [parakeet-tdt_ctc-1.1b](https://huggingface.co/nvidia/parakeet-tdt_ctc-1.1b) | hybrid TDT+CTC | 1.1B | English | NVIDIA |
-| [parakeet_realtime_eou_120m-v1](https://huggingface.co/nvidia/parakeet_realtime_eou_120m-v1) | RNNT, streaming | 120M | cache-aware streaming with end-of-utterance detection (`--stream`) | NVIDIA |
-| [nemotron-3.5-asr-streaming-0.6b](https://huggingface.co/nvidia/nemotron-3.5-asr-streaming-0.6b) | RNNT, streaming | 0.6B | multilingual (40+ locales), prompt-conditioned, offline and cache-aware streaming, pick a language with `--lang` (default `auto`). OpenMDW-1.1 | NVIDIA |
+This is not a bug in the upstream engine — it was simply never designed for these models. The AI4Bharat IndicConformer training pipeline exports depthwise convolution weights in a transposed tensor layout (`[KW, KH, C, 1]`) compared to what the official GGML kernel expects (`[KW, KH, 1, C]`). When the dimensions don't match, the engine aborts instantly during graph construction — before any GPU or CPU compute even begins.
+
+**This repository is a hard fork** that contains structural C++ patches to the GGML graph builder to intercept and safely reshape these tensors on the fly, enabling full inference on all platforms.
 
 ---
 
-## Performance
-
-parakeet.cpp is faster than NeMo's PyTorch runtime on every Parakeet model, on both CPU and GPU, and the transcripts come out byte-identical (WER 0 vs NeMo). Full methodology, all 10 models, quantization tradeoffs, and plots are in [`benchmarks/BENCHMARK.md`](benchmarks/BENCHMARK.md).
-
-### See it run
-
-The same clip fed to parakeet.cpp and to NeMo's own PyTorch runtime on the same GPU. The output comes out byte-for-byte identical, parakeet.cpp just gets there first (slowed down so the sub-100ms race is watchable):
-
-![parakeet.cpp vs NeMo on GPU: identical output, parakeet.cpp finishes first](benchmarks/media/gpu_duel.gif)
-
-The same race on CPU, against NeMo's own PyTorch runtime: [parakeet.cpp vs NeMo on CPU](benchmarks/media/cpu_nemo_duel.mp4) (about 1.5x faster, still byte-for-byte identical). And vs whisper.cpp turbo, same accuracy and far less compute: [on GPU](benchmarks/media/gpu_whisper_duel.mp4) (about 12x faster) and [on CPU](benchmarks/media/cpu_duel.mp4) (about 27x faster).
-
-CPU numbers (20-core x86, vs NeMo PyTorch-CPU, LibriSpeech test-clean, threads=8; RTFx is audio-seconds over processing-seconds, so higher is faster):
-
-| dtype | size vs f32 | speedup vs NeMo | accuracy |
-| ----- | ----------- | --------------- | -------- |
-| f32   | 100%        | 1.11 to 1.69x (median 1.40x) | WER 0, byte-identical to NeMo |
-| f16   | 57%         | up to 1.70x     | near-lossless |
-| q8_0  | 37%         | up to 1.86x     | near-lossless |
-| q4_k  | 26%         | n/a             | small, monotonic WER cost |
-
-Peak RAM is also roughly 2x lower than NeMo, and lower still once quantized.
-
-GPU numbers (NVIDIA GB10, Grace-Blackwell, vs NeMo-GPU in the `nvcr.io/nvidia/nemo` container, since NeMo can't run on the host's torch/CUDA stack directly): parakeet.cpp wins on all 10 models, with a median of 1.25x and up to 4.3x on the large TDT/hybrid models. NeMo's TDT greedy decode isn't CUDA-graph accelerated and ours is a lean C++ loop, which is most of that gap. The log-mel front end runs on the GPU via a ggml DFT-matmul graph; the CPU path is unchanged.
-
----
-
-## Build
-
-Clone with submodules (ggml is vendored at `third_party/ggml`):
-
-```sh
-git clone --recursive https://github.com/mudler/parakeet.cpp
-cd parakeet.cpp
-cmake -B build -DPARAKEET_BUILD_TESTS=ON && cmake --build build -j
-```
-
-Use `-DGGML_NATIVE=OFF` for portable or CI builds (it disables host-specific ISA extensions). For the shared library (LocalAI / dlopen):
-
-```sh
-cmake -B build-shared -DPARAKEET_SHARED=ON -DPARAKEET_BUILD_CLI=ON
-cmake --build build-shared -j
-# -> build-shared/libparakeet.so
-```
-
-### CMake options
-
-| Option                   | Default | Purpose                                    |
-| ------------------------ | ------- | ------------------------------------------ |
-| `PARAKEET_BUILD_TESTS`   | OFF     | Compile and register ctest targets         |
-| `PARAKEET_BUILD_CLI`     | ON      | Build `parakeet-cli`                       |
-| `PARAKEET_SHARED`        | OFF     | Build libparakeet as a shared library      |
-| `PARAKEET_GGML_CUDA`     | OFF     | Forward GGML_CUDA to the submodule         |
-| `PARAKEET_GGML_METAL`    | OFF     | Forward GGML_METAL to the submodule        |
-| `PARAKEET_GGML_VULKAN`   | OFF     | Forward GGML_VULKAN to the submodule       |
-| `PARAKEET_GGML_HIP`      | OFF     | Forward GGML_HIP (ROCm) to the submodule   |
-
-To build for a GPU backend, forward its flag, e.g. Apple Metal:
-
-```sh
-cmake -B build -DPARAKEET_GGML_METAL=ON && cmake --build build -j
-```
-
-The CLI auto-selects the first GPU device the ggml registry reports, so no runtime flag is needed (set `PARAKEET_DEVICE=cpu` to force CPU). Ops the chosen backend has no kernel for run on the CPU automatically, so a model always runs even when one op lacks a GPU kernel. On an Apple M4, Metal is up to about 5x faster than CPU on the larger models; see [Apple Metal](benchmarks/BENCHMARK.md#apple-metal-m4).
-
----
-
-## Docker
-
-Prebuilt images are published to GitHub Container Registry on every push to `master`. They contain just the `parakeet-cli` binary, so mount a converted `.gguf` model and your audio at runtime. Both the CPU and CUDA images are multi-arch (`linux/amd64` and `linux/arm64`), so the right one is pulled for your host automatically:
-
-```sh
-# CPU
-docker run --rm \
-  -v "$PWD/models:/models:ro" \
-  -v "$PWD/audio:/audio:ro" \
-  ghcr.io/mudler/parakeet.cpp-cli:latest \
-  transcribe --model /models/parakeet-tdt_ctc-110m-q5_k.gguf --input /audio/speech.wav --decoder tdt
-
-# CUDA (needs the nvidia container toolkit on the host)
-docker run --rm --gpus all \
-  -v "$PWD/models:/models:ro" -v "$PWD/audio:/audio:ro" \
-  ghcr.io/mudler/parakeet.cpp-cli:latest-cuda \
-  transcribe --model /models/parakeet-tdt_ctc-110m-q5_k.gguf --input /audio/speech.wav --decoder tdt
-```
-
-The CUDA image is built on CUDA 13, so it covers everything from Turing up through Blackwell, including GB10 / Grace-Blackwell (DGX Spark) on arm64.
-
-To build the image yourself, see the build args at the top of the [`Dockerfile`](Dockerfile). The CPU image is the portable `GGML_NATIVE=OFF` build, so it runs on any amd64 or arm64 host.
-
----
-
-## Python environment setup
-
-You need this once, for model conversion and validation. It's not needed for inference:
-
-```sh
-python3 -m venv .venv
-.venv/bin/pip install torch --index-url https://download.pytorch.org/whl/cpu
-.venv/bin/pip install -r scripts/requirements.txt   # nemo_toolkit[asr] + gguf
-```
-
-NeMo 2.7.3 is the validated version. The anchor checkpoint `nvidia/parakeet-tdt_ctc-110m` (about 440 MB) is downloaded automatically by NeMo on first use.
-
----
-
-## Converting a model
-
-Convert a HuggingFace or local `.nemo` checkpoint to GGUF:
-
-```sh
-# Default (F32), lossless and largest
-.venv/bin/python scripts/convert_parakeet_to_gguf.py \
-    --model nvidia/parakeet-tdt_ctc-110m \
-    --output m.gguf
-
-# F16, about 0.58x the size, WER 0 vs NeMo
-.venv/bin/python scripts/convert_parakeet_to_gguf.py \
-    --model nvidia/parakeet-tdt_ctc-110m --dtype f16 --output m.gguf
-
-# Q8_0, about 0.39x the size, WER 0 vs NeMo
-.venv/bin/python scripts/convert_parakeet_to_gguf.py \
-    --model nvidia/parakeet-tdt_ctc-110m --dtype q8_0 --output m.gguf
-```
-
-Supported `--dtype`: `f32` (default), `f16`, `q8_0`.
-
----
-
-## Quantization
-
-The Python `gguf` writer can't produce K-quants (`q4_k`, `q5_k`, `q6_k`), so re-quantize an existing F32 GGUF with the CLI instead:
-
-```sh
-parakeet-cli quantize <in.gguf> <out.gguf> <type>
-# e.g.
-parakeet-cli quantize m.gguf m_q4k.gguf q4_k
-parakeet-cli quantize m.gguf m_q6k.gguf q6_k
-```
-
-Supported types: `q4_0`, `q5_0`, `q8_0`, `q4_k`, `q5_k`, `q6_k`.
-
-Only the large linear `ggml_mul_mat`-consumed weights (encoder FFN, attention projections, joint enc/pred projections, subsampling output projection) get quantized. The conv, LSTM, featurizer, batch_norm, and bias tensors stay F32. See `docs/quantization.md` for the full policy, allowlist, and measured size and WER per type.
-
----
-
-## Running inference
-
-```sh
-# Default decoder (TDT for hybrid/TDT models, CTC for standalone CTC)
-parakeet-cli transcribe --model m.gguf --input audio.wav
-
-# Force a decoder
-parakeet-cli transcribe --model m.gguf --input audio.wav --decoder ctc
-parakeet-cli transcribe --model m.gguf --input audio.wav --decoder tdt
-
-# Per-word timestamps + confidence: one line per word
-#   <start>-<end>  <word>  (<conf>)   (times in seconds)
-parakeet-cli transcribe --model m.gguf --input audio.wav --timestamps
-
-# JSON with the flat text plus per-word and per-token timestamps + confidence:
-#   {"text":"...","words":[{"w":..,"start":..,"end":..,"conf":..}],
-#    "tokens":[{"id":..,"t":..,"conf":..}]}
-parakeet-cli transcribe --model m.gguf --input audio.wav --json
-
-# Print model metadata (arch, dims, mel params, vocab size, TDT durations)
-parakeet-cli info m.gguf
-
-# Cache-aware streaming (EOU model parakeet_realtime_eou_120m-v1): feeds the WAV
-# in the model's chunk schedule, prints partial text incrementally and
-# [EOU @ <t>s] / [EOB @ <t>s] event markers, then the finalized tail. Add
-# --timestamps to also print per-word [start-end] (conf) lines as words finalize.
-parakeet-cli transcribe --model eou.gguf --input audio.wav --stream
-```
-
-Timestamps and confidence match NeMo's `transcribe(timestamps=True)` with the `max_prob` confidence method exactly (word offsets to 0.0 s, per-token and per-word confidence within `5e-6`), for both the TDT and CTC heads. See `docs/parity.md`. Word start and end are in seconds (`frame x hop x subsampling / sample_rate`, which works out to 0.08 s/frame here); confidence is the rescaled softmax probability of the emitted token, aggregated per word with NeMo's `min`.
-
-The `parakeet-cli` binary lands at `build/examples/cli/parakeet-cli`.
-
----
-
-## Batching
-
-Single-clip transcription is the default and needs no flags: every `transcribe` call runs one clip at a time, byte-for-byte identical to before. Batching is an opt-in path for decoding several clips together, which matters when you serve many concurrent requests on a GPU.
-
-The win is on the **decode** side. A transducer (TDT/RNN-T) decodes autoregressively with tiny per-step prediction-LSTM and joint GEMMs; one clip launches hundreds of these matvec-sized kernels and leaves the GPU mostly idle between launches. Decoding N clips together coalesces each step into one batched GEMM, so the device stays busy. On the NVIDIA GB10 this reaches about **10-12x** at batch size 16 (CPU about 3-5x); the encoder is already compute-bound, so batching it gives no throughput win. CTC has no autoregressive decode, so batching does not apply to standalone CTC models. The batched path is bit-identical to running the clips one by one (greedy decode is deterministic). Full numbers and per-model tables are in [`benchmarks/BENCHMARK.md`](benchmarks/BENCHMARK.md#batched-decode-throughput).
-
-Measure it yourself:
-
-```bash
-# Decode-only: serial vs batched decode of one clip replicated B times (the win in isolation).
-parakeet-cli bench-decode --model <model.gguf> --audio <wav> [--batch-sizes 1,4,8,16] [--threads N] [--reps R] [--json <out>]
-
-# Full transcribe (encoder + decode) over a manifest at several batch sizes.
-parakeet-cli bench-batch --model <model.gguf> --manifest <file> [--decoder ctc|tdt] [--threads N] [--batch-sizes 1,4,8] [--json <out>]
-```
-
-To batch from code, use the batched entry points (single-clip B=1 is just N=1):
-
-- C++ (`src/model.hpp`): `Model::transcribe_16k_batch(pcms16k, decoder)` and `transcribe_16k_batch_with_timestamps(...)` take N clips of 16 kHz mono float PCM and return N results.
-- C-API (`include/parakeet_capi.h`): `parakeet_capi_transcribe_pcm_batch(...)` (N transcripts) and `parakeet_capi_transcribe_pcm_batch_json(...)` (one JSON array of N `{text,words,tokens}` objects). These are what LocalAI's `parakeet-cpp` backend calls to coalesce concurrent requests; it leaves batching off by default and exposes a `batch_max_size` option to opt in.
-
----
-
-## C-API (`libparakeet.so`)
-
-`include/parakeet_capi.h` defines a flat, exception-free C-API meant for `dlopen` / FFI / LocalAI integration. Build the shared library with `-DPARAKEET_SHARED=ON`:
-
-```c
-#include "parakeet_capi.h"
-
-parakeet_ctx *ctx = parakeet_capi_load("model.gguf");  // load ONCE
-if (!ctx) { fprintf(stderr, "%s\n", parakeet_capi_last_error(ctx)); return 1; }
-
-char *text = parakeet_capi_transcribe_path(ctx, "audio.wav", 0 /*default*/);
-if (text) { printf("%s\n", text); parakeet_capi_free_string(text); }
-
-parakeet_capi_free(ctx);
-```
-
-In-memory PCM:
-```c
-char *text = parakeet_capi_transcribe_pcm(ctx, samples, n_samples,
-                                          sample_rate, 0 /*default*/);
-```
-
-Timestamps and confidence as JSON (matches NeMo `timestamps=True` + `max_prob`):
-```c
-char *json = parakeet_capi_transcribe_path_json(ctx, "audio.wav", 0 /*default*/);
-// {"text":"...",
-//  "words":[{"w":"Well,","start":0.480,"end":0.640,"conf":0.7859}, ...],
-//  "tokens":[{"id":639,"t":0.480,"conf":0.9969}, ...]}
-if (json) { printf("%s\n", json); parakeet_capi_free_string(json); }
-```
-`start`/`end`/`t` are in seconds; `conf` is the rescaled softmax probability of the emitted token in `(0,1]` (a word's `conf` is the `min` over its tokens).
-
-### Streaming (cache-aware EOU model)
-
-For `parakeet_realtime_eou_120m-v1`, a streaming session decodes 16 kHz mono f32 PCM as it arrives, returning newly-finalized text and signalling EOU/EOB events:
-
-```c
-parakeet_stream *s = parakeet_capi_stream_begin(ctx);
-int eou = 0;
-char *t = parakeet_capi_stream_feed(s, pcm, n_samples, &eou); // "" if none yet
-if (t) { printf("%s", t); parakeet_capi_free_string(t); }
-if (eou) printf(" [EOU]");
-// ...feed more chunks...
-char *tail = parakeet_capi_stream_finalize(s);                // flush the tail
-if (tail) { printf("%s\n", tail); parakeet_capi_free_string(tail); }
-parakeet_capi_stream_free(s);
-```
-
-`<EOU>` (end-of-utterance) and `<EOB>` (backchannel) are stripped from the text and surfaced via `*eou_out` (the CLI `--stream` prints them as `[EOU @ <t>s]` markers). The streaming transcript matches NeMo's cache-aware streaming exactly, and `finalize` flushes the end-of-stream tail without fabricating an `<EOU>` that NeMo would not emit.
-
-The LocalAI backend (in the LocalAI repo) dlopens `libparakeet.so` and uses these symbols directly: the offline `parakeet_capi_transcribe_*` / `parakeet_capi_transcribe_path_json` and the streaming `parakeet_capi_stream_*`. See `include/parakeet_capi.h` for the full API. The C++ streaming session (`pk::StreamingSession`) also exposes per-word timestamps and confidence as words finalize, via `drain_words()` alongside the EOU events, which the CLI `--stream --timestamps` path prints.
-
----
-
-## Model coverage
-
-See `docs/parity.md` for the full coverage matrix. In short:
-
-| Family | Representative checkpoints | Heads | WER vs NeMo |
-| --- | --- | --- | --- |
-| Hybrid TDT+CTC | `parakeet-tdt_ctc-110m`, `parakeet-tdt_ctc-1.1b` | TDT + CTC | 0.0 |
-| TDT (hybrid) | `parakeet-tdt-0.6b-v2`, `parakeet-tdt-0.6b-v3` (multilingual) | TDT | 0.0 |
-| Pure TDT | `parakeet-tdt-1.1b` | TDT | 0.0 |
-| CTC | `parakeet-ctc-0.6b`, `parakeet-ctc-1.1b` | CTC | 0.0 |
-| RNNT | `parakeet-rnnt-0.6b`, `parakeet-rnnt-1.1b` | RNNT | 0.0 |
-
-All 10 published offline checkpoints are validated at WER 0 vs NeMo 2.7.3. Sizes: 110M (512/17 layers), 0.6B (1024/24), 1.1B (1024/42).
-
-Cache-aware streaming and EOU (`parakeet_realtime_eou_120m-v1`) is implemented too: `layer_norm` plus causal conv, causal subsampling, chunked-limited attention, per-layer conv/attention caches, carried RNN-T decoder state, and `<EOU>`/`<EOB>` events. The streaming transcript matches NeMo's cache-aware streaming byte for byte. See `docs/parity.md` (the Streaming + EOU section).
-
----
-
-## Running tests
-
-Model-independent (run anywhere):
-
-```sh
-ctest --test-dir build --output-on-failure -LE model
-```
-
-Model-dependent (need venv + checkpoint):
-
-```sh
-export PARAKEET_TEST_GGUF=/tmp/pk110m.gguf
-export PARAKEET_TEST_BASELINE=/tmp/baseline.gguf
-export PARAKEET_TEST_BASELINE_SPEECH=/tmp/baseline_speech.gguf
-ctest --test-dir build --output-on-failure
-```
-
-Tests labelled `model` return exit code 77 (ctest SKIP) when their required env vars are absent, so they never break a CI environment that has no model.
-
----
-
-## Roadmap / TODO
-
-- **Tune the GPU encoder kernels.** On the GB10 GPU, parakeet.cpp is faster than NeMo on all 10 models (median 1.25x, up to 4.3x), but the gains are smallest on the pure-encoder CTC models (around 1.2x), because ggml's generic CUDA conv/attention kernels still trail NeMo's tuned cuDNN. Closing that gap (better conv1d and flash-attention paths for the FastConformer encoder) is the main remaining GPU headroom. The log-mel already runs on the backend (`GpuMel`); the CPU path is unaffected.
-
----
-
-## Why parakeet.cpp
-
-NeMo is a great training framework, but running Parakeet just for inference drags in a heavy Python/PyTorch stack. parakeet.cpp is a from-scratch C++17/ggml port focused purely on inference:
-
-- **No Python at inference.** A single `libparakeet.so` (or static lib) behind a flat C API (`include/parakeet_capi.h`), easy to embed from C, C++, Go, or Rust.
-- **Faster than NeMo** on CPU and GPU (see [Performance](#performance)), with byte-identical output.
-- **Small and portable.** GGUF models with f16 / q8_0 / K-quant variants, running on CPU and any ggml GPU backend (CUDA, Metal, Vulkan, HIP).
-- **Full family coverage.** CTC, RNNT, TDT, hybrid TDT-CTC, multilingual, and cache-aware streaming with EOU, all validated at WER 0 vs NeMo.
-
----
-
-## Citation
-
-If you use parakeet.cpp, please cite this repository and the original models:
-
-```bibtex
-@software{parakeet_cpp,
-  title  = {parakeet.cpp: a C++/ggml inference engine for NVIDIA Parakeet ASR},
-  author = {Di Giacinto, Ettore and Palethorpe, Richard},
-  url    = {https://github.com/mudler/parakeet.cpp},
-  year   = {2026}
+## 🔧 The Patch — What We Changed
+
+The fix lives in **`src/subsampling.cpp`**, inside the depthwise convolution stages of both `build_graph()` and `build_graph_batched()`:
+
+```cpp
+// Fix for AI4Bharat models where depthwise weights are [KW, KH, C, 1]
+// instead of the expected [KW, KH, 1, C]
+if (dww->ne[2] > 1 && dww->ne[3] == 1) {
+    dww = ggml_reshape_4d(ctx, dww, dww->ne[0], dww->ne[1], 1, dww->ne[2]);
 }
 ```
 
-The Parakeet models are by NVIDIA NeMo ([NVIDIA-NeMo/NeMo](https://github.com/NVIDIA-NeMo/NeMo)).
+This check is **zero-cost for standard NVIDIA models** (the condition evaluates to `false` and no reshape occurs), so this fork remains fully backward-compatible with all official Parakeet checkpoints.
 
-## Author
+```
+Official upstream:  [KW, KH, C, 1] → GGML_ASSERT(ne[2]==1) → ❌ CRASH
+This fork:          [KW, KH, C, 1] → reshape → [KW, KH, 1, C] → ✅ SUCCESS
+```
 
-Ettore Di Giacinto ([@mudler](https://github.com/mudler)).
+---
 
-## License
+## ⚡ Quick Start
 
-parakeet.cpp is released under the [MIT License](LICENSE). The model weights are governed by NVIDIA's original Parakeet model licenses, so check each model card on HuggingFace.
+```sh
+# 1. Clone
+git clone --recursive https://github.com/AnshSinglaDev/parakeet.cpp
+cd parakeet.cpp
+
+# 2. Build (pick your backend)
+cmake -B build -DPARAKEET_GGML_METAL=ON    # macOS (Apple Metal)
+# cmake -B build -DGGML_CUDA=ON            # Linux/Win (NVIDIA CUDA)
+# cmake -B build -DGGML_VULKAN=ON          # Windows (Vulkan)
+cmake --build build -j
+
+# 3. Transcribe Hindi audio
+./build/examples/cli/parakeet-cli transcribe \
+  --model indicconformer-hindi.f32.gguf \
+  --input audio.wav --decoder ctc --lang hi
+```
+
+**Example output:**
+```
+$ ./parakeet-cli transcribe --model indicconformer-hindi.f32.gguf --input hi-audio.wav --decoder ctc --lang hi
+
+[parakeet] pk::Backend using device: CUDA0 (NVIDIA GeForce RTX 5070 Ti)
+[parakeet] loaded model: indicconformer-hindi.f32.gguf (120M params, CTC decoder)
+[parakeet] audio: 7.26s, 16000 Hz, mono
+
+टीन रूम आ चुके हैं और सब कुछ तैयार है
+
+[parakeet] transcription completed in 0.048s (RTF: 0.007)
+```
+
+---
+
+## 📦 Supported Models
+
+### 🇮🇳 Indic & Regional Models (Require This Fork)
+
+| Model | Languages | Architecture | Params | Download |
+|-------|-----------|-------------|--------|----------|
+| **IndicConformer Hindi** | Hindi | Conformer-CTC | ~120M | [🤗 Singla0009/IndicConformer-GGUF](https://huggingface.co/Singla0009/IndicConformer-GGUF) |
+| **IndicConformer Punjabi** | Punjabi | Conformer-CTC | ~120M | [🤗 Singla0009/IndicConformer-GGUF](https://huggingface.co/Singla0009/IndicConformer-GGUF) |
+| **Hinglish Conformer** | Hindi + English | Conformer-CTC | ~120M | [🤗 Singla0009/Hinglish-Conformer-CTC-GGUF](https://huggingface.co/Singla0009/Hinglish-Conformer-CTC-GGUF) |
+| **Portuguese FastConformer** | Portuguese | FastConformer-Hybrid | ~120M | [🤗 Singla0009/Portuguese-FastConformer-GGUF](https://huggingface.co/Singla0009/Portuguese-FastConformer-GGUF) |
+
+### 🌐 Standard NVIDIA Models (Also Fully Supported)
+
+| Model | Languages | Architecture | Params | Download |
+|-------|-----------|-------------|--------|----------|
+| **Parakeet TDT 0.6B v3** | 25 European Languages | TDT | 600M | [🤗 Singla0009/Parakeet-TDT-0.6B-Multilingual-GGUF](https://huggingface.co/Singla0009/Parakeet-TDT-0.6B-Multilingual-GGUF) |
+| **Parakeet TDT 0.6B v2** | English | TDT | 600M | [🤗 nvidia/parakeet-tdt-0.6b-v2](https://huggingface.co/nvidia/parakeet-tdt-0.6b-v2) |
+| **Parakeet CTC 0.6B** | English | CTC | 600M | [🤗 nvidia/parakeet-ctc-0.6b](https://huggingface.co/nvidia/parakeet-ctc-0.6b) |
+| **Parakeet TDT-CTC 110M** | English | Hybrid TDT+CTC | 110M | [🤗 nvidia/parakeet-tdt_ctc-110m](https://huggingface.co/nvidia/parakeet-tdt_ctc-110m) |
+
+> All official NVIDIA Parakeet models from the upstream repo work identically here — the patch is a no-op for standard tensor layouts.
+
+---
+
+## 📊 Benchmarks
+
+All benchmarks measured on an **NVIDIA GeForce RTX 5070 Ti** with a 7.26-second test clip (16kHz mono).
+
+### Inference Speed (RTF — Lower is Faster)
+
+<p align="center">
+  <img src="benchmarks/plots/speed_comparison.png" width="80%" alt="Speed comparison: parakeet.cpp Indic vs Whisper"/>
+</p>
+
+### Hindi Accuracy (WER% — Lower is Better)
+
+<p align="center">
+  <img src="benchmarks/plots/hindi_wer_comparison.png" width="80%" alt="Hindi Word Error Rate comparison"/>
+</p>
+
+### Memory & Disk Footprint
+
+<p align="center">
+  <img src="benchmarks/plots/memory_comparison.png" width="80%" alt="Memory and disk footprint comparison"/>
+</p>
+
+### Language Coverage
+
+<p align="center">
+  <img src="benchmarks/plots/language_coverage.png" width="80%" alt="Language coverage comparison"/>
+</p>
+
+### Summary Table
+
+| | This Engine (Indic) | Whisper large-v3 | Google Cloud STT |
+|---|---|---|---|
+| **Speed** | **15x+ real-time** | ~1x real-time | Network dependent |
+| **RAM** | < 600 MB | ~3.9 GB | N/A |
+| **Model Size** | 480 MB | 2.9 GB | N/A |
+| **Privacy** | 100% offline | 100% offline | Cloud only |
+| **Hindi WER** | **13.5%** (Kathbath) | ~20% | ~15% |
+| **Punjabi WER** | **15.1%** (Kathbath) | N/A | ~18% |
+| **GPU Backends** | CUDA, Metal, Vulkan | CUDA, Metal, Vulkan | N/A |
+
+---
+
+## 🚀 Build Instructions
+
+### Prerequisites
+```sh
+git clone --recursive https://github.com/AnshSinglaDev/parakeet.cpp
+cd parakeet.cpp
+```
+
+### Linux — NVIDIA CUDA
+```sh
+cmake -B build -DGGML_CUDA=ON
+cmake --build build -j$(nproc)
+```
+
+### Linux — CPU Only (OpenBLAS)
+```sh
+sudo apt install libopenblas-dev
+cmake -B build -DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS
+cmake --build build -j$(nproc)
+```
+
+### macOS — Apple Metal (M1/M2/M3/M4)
+```sh
+cmake -B build -DPARAKEET_GGML_METAL=ON
+cmake --build build -j$(sysctl -n hw.logicalcpu)
+```
+
+### Windows — Vulkan
+```sh
+cmake -B build -DGGML_VULKAN=ON
+cmake --build build --config Release
+```
+
+### Windows — CUDA
+```sh
+cmake -B build -DGGML_CUDA=ON
+cmake --build build --config Release
+```
+
+### Build Options
+
+| Option | Default | Purpose |
+|--------|---------|---------|
+| `PARAKEET_BUILD_CLI` | ON | Build `parakeet-cli` binary |
+| `PARAKEET_SHARED` | OFF | Build libparakeet as shared library |
+| `PARAKEET_GGML_CUDA` | OFF | NVIDIA GPU acceleration |
+| `PARAKEET_GGML_METAL` | OFF | Apple GPU acceleration |
+| `PARAKEET_GGML_VULKAN` | OFF | Cross-vendor GPU acceleration |
+| `PARAKEET_GGML_HIP` | OFF | AMD ROCm GPU acceleration |
+
+The compiled binary will be at: `build/examples/cli/parakeet-cli`
+
+---
+
+## 🎙️ Usage
+
+### Transcription Examples
+```sh
+# Hindi (IndicConformer)
+./parakeet-cli transcribe \
+  --model indicconformer-hindi.f32.gguf \
+  --input audio.wav \
+  --decoder ctc \
+  --lang hi
+
+# Punjabi
+./parakeet-cli transcribe \
+  --model indicconformer-punjabi.f32.gguf \
+  --input audio.wav \
+  --decoder ctc \
+  --lang pa
+
+# Hinglish (Hindi-English code-switched)
+./parakeet-cli transcribe \
+  --model hinglish-conformer-ctc.f32.gguf \
+  --input audio.wav \
+  --decoder ctc \
+  --lang hi
+
+# Multilingual (25 languages, auto-detect)
+./parakeet-cli transcribe \
+  --model parakeet-tdt-0.6b-v3.f32.gguf \
+  --input audio.wav \
+  --decoder tdt
+```
+
+### JSON Output with Timestamps
+```sh
+./parakeet-cli transcribe \
+  --model indicconformer-hindi.f32.gguf \
+  --input audio.wav \
+  --decoder ctc \
+  --json
+```
+
+**Example JSON output:**
+```json
+{
+  "text": "टीन रूम आ चुके हैं और सब कुछ तैयार है",
+  "words": [
+    {"w": "टीन", "start": 0.080, "end": 0.320, "conf": 0.9812},
+    {"w": "रूम", "start": 0.320, "end": 0.560, "conf": 0.9734},
+    {"w": "आ", "start": 0.640, "end": 0.800, "conf": 0.9651}
+  ]
+}
+```
+
+### Model Info
+```sh
+./parakeet-cli info indicconformer-hindi.f32.gguf
+```
+
+### Audio Format
+Input must be **16-bit WAV, 16kHz, mono**. Convert with ffmpeg:
+```sh
+ffmpeg -i input.mp3 -ar 16000 -ac 1 -c:a pcm_s16le output.wav
+```
+
+---
+
+## 🏗️ Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Audio Input (WAV)                     │
+│                 16kHz, mono, 16-bit PCM                  │
+├─────────────────────────────────────────────────────────┤
+│              80-channel Log-Mel Filterbank               │
+│            (25ms windows, 10ms stride)                   │
+├─────────────────────────────────────────────────────────┤
+│           Subsampling Layer (Conv2d + DW Conv)           │
+│    ┌──────────────────────────────────────────────┐      │
+│    │  PATCHED: ggml_reshape_4d tensor fix         │      │
+│    │  [KW,KH,C,1] -> [KW,KH,1,C] for Indic DW   │      │
+│    └──────────────────────────────────────────────┘      │
+├─────────────────────────────────────────────────────────┤
+│              Conformer Encoder Layers                    │
+│     (Self-Attention + Depthwise Convolutions)            │
+├─────────────────────────────────────────────────────────┤
+│                  Decoder Head                            │
+│           CTC / TDT / RNNT (model-dependent)             │
+├─────────────────────────────────────────────────────────┤
+│                 Transcribed Text                         │
+│    "टीन रूम आ चुके हैं और सब कुछ तैयार है"              │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🖥️ Desktop App — RenderCaption
+
+This engine is the speech-to-text backend powering [**RenderCaption**](https://github.com/AnshSinglaDev/rendercaption) — a fully offline, GPU-accelerated desktop transcription app built with Rust and Tauri.
+
+Instead of using terminal commands, you can load any of these models into the RenderCaption desktop app and transcribe audio/video with a beautiful graphical interface.
+
+**Download installers:** [GitHub Releases](https://github.com/AnshSinglaDev/rendercaption/releases/tag/v0.1.2)
+
+| Platform | Installer |
+|----------|-----------|
+| Windows | `.exe` / `.msi` |
+| Linux (Ubuntu/Debian) | `.deb` |
+| Linux (Fedora/RHEL) | `.rpm` |
+| Linux (Universal) | `.AppImage` |
+
+---
+
+## 🤝 Credits & Acknowledgements
+
+| | |
+|---|---|
+| **Upstream Engine** | [mudler/parakeet.cpp](https://github.com/mudler/parakeet.cpp) by Ettore Di Giacinto ([@mudler](https://github.com/mudler)) — MIT License |
+| **Original AI Models** | [AI4Bharat](https://ai4bharat.iitm.ac.in/) (IIT Madras) — CC-BY-4.0 |
+| **NVIDIA NeMo** | [NVIDIA-NeMo/NeMo](https://github.com/NVIDIA-NeMo/NeMo) — Parakeet model architecture |
+| **Indic Patches & Maintenance** | [Ansh Singla](https://github.com/AnshSinglaDev) |
+
+---
+
+## 📄 License
+
+This project is released under the [MIT License](LICENSE), same as the upstream engine.
+The model weights are governed by their respective original licenses:
+- NVIDIA Parakeet models → Check each model card on HuggingFace
+- AI4Bharat IndicConformer models → [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/)
