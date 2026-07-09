@@ -169,10 +169,6 @@ Subsampling::build_graph_batched(ggml_context *ctx, const float *mel,
     for (int si = 0; si < 2; ++si) {
       const StageW &s = stages[si];
       ggml_tensor *dww = clone_weight(ctx, ml, s.dw_w);
-      // Fix for custom exported models where depthwise weights are [KW, KH, C, 1] instead of [KW, KH, 1, C]
-      if (dww->ne[2] > 1 && dww->ne[3] == 1) {
-          dww = ggml_reshape_4d(ctx, dww, dww->ne[0], dww->ne[1], 1, dww->ne[2]);
-      }
       ggml_tensor *dwb = clone_weight(ctx, ml, s.dw_b);
       x = mask_time(x, *stage_valid_t[si]);
       if (causal) {
@@ -342,10 +338,6 @@ ggml_tensor *Subsampling::build_graph(ggml_context *ctx,
     for (int si = 0; si < 2; ++si) {
       const StageW &s = stages[si];
       ggml_tensor *dww = clone_weight(ctx, ml, s.dw_w);
-      // Fix for custom exported models where depthwise weights are [KW, KH, C, 1] instead of [KW, KH, 1, C]
-      if (dww->ne[2] > 1 && dww->ne[3] == 1) {
-          dww = ggml_reshape_4d(ctx, dww, dww->ne[0], dww->ne[1], 1, dww->ne[2]);
-      }
       ggml_tensor *dwb = clone_weight(ctx, ml, s.dw_b);
       if (causal) {
         x = mask_time(x, stage_valid_t[si]);
